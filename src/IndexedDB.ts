@@ -126,6 +126,7 @@ const _IndexedDB = {
 		idbFactory: { type: 'object', required: false },
 	},
 
+	// @ts-ignore
 	async isAvailable(idbFactory: IDBFactory = globalThis.indexedDB): Promise<boolean> {
 		try {
 			if (!(idbFactory instanceof IDBFactory)) {

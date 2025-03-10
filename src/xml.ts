@@ -1,6 +1,7 @@
-import type { Backend, CreationOptions, File, InodeLike, StatsLike } from '@zenfs/core';
-import { _inode_fields, constants, decodeRaw, encodeRaw, Errno, ErrnoError, FileSystem, LazyFile, Stats, Sync } from '@zenfs/core';
-import { basename, dirname } from '@zenfs/core/vfs/path.js';
+import type { Backend, CreationOptions, InodeLike, StatsLike } from '@zenfs/core';
+import { _inode_fields, constants, decodeRaw, encodeRaw, Errno, ErrnoError, FileSystem, Stats, Sync } from '@zenfs/core';
+import { basename, dirname } from '@zenfs/core/path.js';
+import { FileHandle } from '@zenfs/core/vfs/promises.js';
 
 export interface XMLOptions {
 	/**
@@ -44,10 +45,9 @@ export class XMLFS extends Sync(FileSystem) {
 		public readonly root: Element = new DOMParser().parseFromString('<fs></fs>', 'application/xml').documentElement
 	) {
 		super(0x20786d6c, 'xmltmpfs');
-		this.attributes.set('setid');
 
 		try {
-			this.mkdirSync('/', 0o777, { uid: 0, gid: 0 });
+			this.mkdirSync('/', { mode: 0o777, uid: 0, gid: 0 });
 		} catch (e: any) {
 			const error = e as ErrnoError;
 			if (error.code != 'EEXIST') throw error;
@@ -64,20 +64,21 @@ export class XMLFS extends Sync(FileSystem) {
 		return get_stats(this.get('stat', path));
 	}
 
-	public openFileSync(path: string, flag: string): File {
-		const node = this.get('openFile', path);
-		return new LazyFile(this, path, flag, get_stats(node));
+	public touchSync(path: string, metadata: Partial<InodeLike>): void {
+		const node = this.get('touch', path);
+		set_stats(node, metadata);
 	}
 
-	public createFileSync(path: string, flag: string, mode: number, { uid, gid }: CreationOptions): File {
+	public createFileSync(path: string, { mode, uid, gid }: CreationOptions): InodeLike {
 		const parent = this.statSync(dirname(path));
 		const stats = new Stats({
 			mode: mode | constants.S_IFREG,
 			uid: parent.mode & constants.S_ISUID ? parent.uid : uid,
 			gid: parent.mode & constants.S_ISGID ? parent.gid : gid,
 		});
-		this.create('createFile', path, stats);
-		return new LazyFile(this, path, flag, stats);
+		// @ts-ignore
+		return this.create('createFile', path, stats);
+		// return new LazyFile(this, path, flag, stats);
 	}
 
 	public unlinkSync(path: string): void {
@@ -93,7 +94,7 @@ export class XMLFS extends Sync(FileSystem) {
 		this.remove('rmdir', node, path);
 	}
 
-	public mkdirSync(path: string, mode: number, { uid, gid }: CreationOptions): void {
+	public mkdirSync(path: string, { uid, gid, mode }: CreationOptions): InodeLike {
 		const parent = this.statSync(dirname(path));
 		const node = this.create('mkdir', path, {
 			mode: mode | constants.S_IFDIR,
@@ -101,6 +102,8 @@ export class XMLFS extends Sync(FileSystem) {
 			gid: parent.mode & constants.S_ISGID ? parent.gid : gid,
 		});
 		node.textContent = '[]';
+		// @ts-expect-error
+		return node as InodeLike;
 	}
 
 	public readdirSync(path: string): string[] {
