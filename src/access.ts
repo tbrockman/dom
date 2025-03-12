@@ -190,10 +190,6 @@ const _WebAccess = {
 
 	async create(options: WebAccessOptions) {
 		const fs = new WebAccessFS(options.handle);
-		// @ts-expect-error
-		fs.options = {
-			handle: options.handle,
-		};
 		await fs._loadHandles('/', options.handle);
 		await fs._loadMetadata(options.metadata);
 		return fs;

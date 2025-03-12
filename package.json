@@ -48,9 +48,6 @@
 		"test": "npx zenfs-test -abcf",
 		"prepublishOnly": "npm run build"
 	},
-	"dependencies": {
-		"@zenfs/core": "^1.11.4"
-	},
 	"devDependencies": {
 		"@eslint/js": "^9.12.0",
 		"c8": "^10.1.3",
@@ -64,6 +61,7 @@
 		"typescript-eslint": "^8.8.1"
 	},
 	"peerDependencies": {
+		"@zenfs/core": "^1.11.4",
 		"utilium": "^1.2.10"
 	},
 	"keywords": [
