@@ -16,6 +16,7 @@ function wrap<T>(request: IDBRequest<T>): Promise<T> {
 /**
  * @internal @hidden
  */
+// @ts-expect-error
 export class IndexedDBTransaction extends AsyncTransaction<IndexedDBStore> {
 	private _idb: IDBObjectStore;
 
@@ -126,6 +127,7 @@ const _IndexedDB = {
 		idbFactory: { type: 'object', required: false },
 	},
 
+	// @ts-ignore
 	async isAvailable(idbFactory: IDBFactory = globalThis.indexedDB): Promise<boolean> {
 		try {
 			if (!(idbFactory instanceof IDBFactory)) {

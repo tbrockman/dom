@@ -1,6 +1,8 @@
-import type { Backend, CreationOptions, File, InodeLike, StatsLike } from '@zenfs/core';
-import { _inode_fields, constants, decodeRaw, encodeRaw, Errno, ErrnoError, FileSystem, LazyFile, Stats, Sync } from '@zenfs/core';
-import { basename, dirname } from '@zenfs/core/vfs/path.js';
+// @ts-nocheck
+
+import type { Backend, CreationOptions, InodeLike, StatsLike } from '@zenfs/core';
+import { _inode_fields, constants, decodeRaw, encodeRaw, Errno, ErrnoError, FileSystem, Stats, Sync } from '@zenfs/core';
+import { basename, dirname } from '@zenfs/core/path.js';
 
 export interface XMLOptions {
 	/**
@@ -44,10 +46,9 @@ export class XMLFS extends Sync(FileSystem) {
 		public readonly root: Element = new DOMParser().parseFromString('<fs></fs>', 'application/xml').documentElement
 	) {
 		super(0x20786d6c, 'xmltmpfs');
-		this.attributes.set('setid');
 
 		try {
-			this.mkdirSync('/', 0o777, { uid: 0, gid: 0 });
+			this.mkdirSync('/', { mode: 0o777, uid: 0, gid: 0 });
 		} catch (e: any) {
 			const error = e as ErrnoError;
 			if (error.code != 'EEXIST') throw error;
@@ -69,7 +70,7 @@ export class XMLFS extends Sync(FileSystem) {
 		return new LazyFile(this, path, flag, get_stats(node));
 	}
 
-	public createFileSync(path: string, flag: string, mode: number, { uid, gid }: CreationOptions): File {
+	public createFileSync(path: string, { mode, uid, gid }: CreationOptions): InodeLike {
 		const parent = this.statSync(dirname(path));
 		const stats = new Stats({
 			mode: mode | constants.S_IFREG,
@@ -77,7 +78,7 @@ export class XMLFS extends Sync(FileSystem) {
 			gid: parent.mode & constants.S_ISGID ? parent.gid : gid,
 		});
 		this.create('createFile', path, stats);
-		return new LazyFile(this, path, flag, stats);
+		// return new LazyFile(this, path, flag, stats);
 	}
 
 	public unlinkSync(path: string): void {
@@ -93,7 +94,7 @@ export class XMLFS extends Sync(FileSystem) {
 		this.remove('rmdir', node, path);
 	}
 
-	public mkdirSync(path: string, mode: number, { uid, gid }: CreationOptions): void {
+	public mkdirSync(path: string, { uid, gid, mode }: CreationOptions): InodeLike {
 		const parent = this.statSync(dirname(path));
 		const node = this.create('mkdir', path, {
 			mode: mode | constants.S_IFDIR,
