@@ -6,4 +6,4 @@ import { handle } from './web-access.js';
 await configureSingle({ backend: WebAccess, handle });
 
 copySync(data);
-await copyAsync(data);
+// await copyAsync(data);

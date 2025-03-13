@@ -159,11 +159,11 @@ export class WebAccessFS extends Async(IndexFS) {
 	}
 
 	public async mkdir(path: string, options: CreationOptions): Promise<InodeLike> {
-		await super.mkdir(path, options);
+		const inode = await super.mkdir(path, options);
 		const handle = this.get('directory', dirname(path), 'mkdir');
 		const dir = await handle.getDirectoryHandle(basename(path), { create: true }).catch((ex: DOMException) => _throw(convertException(ex, path)));
 		this._handles.set(path, dir);
-		return this.index.get(basename(path));
+		return inode;
 	}
 
 	protected get<const T extends FileSystemHandleKind | null>(

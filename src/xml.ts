@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import type { Backend, CreationOptions, InodeLike, StatsLike } from '@zenfs/core';
 import { _inode_fields, constants, decodeRaw, encodeRaw, Errno, ErrnoError, FileSystem, Stats, Sync } from '@zenfs/core';
 import { basename, dirname } from '@zenfs/core/path.js';
@@ -65,9 +63,9 @@ export class XMLFS extends Sync(FileSystem) {
 		return get_stats(this.get('stat', path));
 	}
 
-	public openFileSync(path: string, flag: string): File {
-		const node = this.get('openFile', path);
-		return new LazyFile(this, path, flag, get_stats(node));
+	public touchSync(path: string, metadata: Partial<InodeLike>): void {
+		const node = this.get('touch', path);
+		set_stats(node, metadata);
 	}
 
 	public createFileSync(path: string, { mode, uid, gid }: CreationOptions): InodeLike {
@@ -77,7 +75,8 @@ export class XMLFS extends Sync(FileSystem) {
 			uid: parent.mode & constants.S_ISUID ? parent.uid : uid,
 			gid: parent.mode & constants.S_ISGID ? parent.gid : gid,
 		});
-		this.create('createFile', path, stats);
+		// @ts-ignore
+		return this.create('createFile', path, stats);
 		// return new LazyFile(this, path, flag, stats);
 	}
 
@@ -102,6 +101,8 @@ export class XMLFS extends Sync(FileSystem) {
 			gid: parent.mode & constants.S_ISGID ? parent.gid : gid,
 		});
 		node.textContent = '[]';
+		// @ts-expect-error
+		return node as InodeLike;
 	}
 
 	public readdirSync(path: string): string[] {
