@@ -1,7 +1,7 @@
 import type { Backend, CreationOptions, FileSystem, InodeLike } from '@zenfs/core';
 import { Async, constants, Errno, ErrnoError, IndexFS, InMemory, Inode, log } from '@zenfs/core';
-import { S_IFDIR, S_IFMT } from '@zenfs/core/vfs/constants.js';
 import { basename, dirname, join } from '@zenfs/core/path.js';
+import { S_IFDIR, S_IFMT } from '@zenfs/core/vfs/constants.js';
 import { _throw } from 'utilium';
 import { convertException } from './utils.js';
 

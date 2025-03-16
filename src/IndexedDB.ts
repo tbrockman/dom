@@ -16,7 +16,6 @@ function wrap<T>(request: IDBRequest<T>): Promise<T> {
 /**
  * @internal @hidden
  */
-// @ts-expect-error
 export class IndexedDBTransaction extends AsyncTransaction<IndexedDBStore> {
 	private _idb: IDBObjectStore;
 
@@ -127,20 +126,17 @@ const _IndexedDB = {
 		idbFactory: { type: 'object', required: false },
 	},
 
-	// @ts-ignore
-	async isAvailable(idbFactory: IDBFactory = globalThis.indexedDB): Promise<boolean> {
-		return true;
+	async isAvailable({ idbFactory = globalThis.indexedDB }: IndexedDBOptions): Promise<boolean> {
 		try {
-			if (!(idbFactory instanceof IDBFactory)) {
-				return false;
-			}
+			if (!(idbFactory instanceof IDBFactory)) return false;
+
 			const req = idbFactory.open('__zenfs_test');
 			await wrap(req);
 			return true;
 		} catch {
 			return false;
 		} finally {
-			idbFactory.deleteDatabase('__zenfs_test');
+			idbFactory?.deleteDatabase('__zenfs_test');
 		}
 	},
 
