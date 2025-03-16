@@ -1,5 +1,5 @@
 import type { Backend, CreationOptions, InodeLike, StatsLike } from '@zenfs/core';
-import { _inode_fields, constants, decodeRaw, encodeRaw, Errno, ErrnoError, FileSystem, Stats, Sync } from '@zenfs/core';
+import { _inode_fields, constants, Errno, ErrnoError, FileSystem, Stats, Sync } from '@zenfs/core';
 import { basename, dirname } from '@zenfs/core/path.js';
 
 export interface XMLOptions {
@@ -122,18 +122,21 @@ export class XMLFS extends Sync(FileSystem) {
 
 	public syncSync(path: string, data?: Uint8Array, stats: Readonly<Partial<InodeLike>> = {}): void {
 		const node = this.get('sync', path);
+		// @ts-expect-error
 		if (data) node.textContent = decodeRaw(data);
 		set_stats(node, stats);
 	}
 
 	public readSync(path: string, buffer: Uint8Array, offset: number, end: number): void {
 		const node = this.get('read', path);
+		// @ts-expect-error
 		const raw = encodeRaw(node.textContent!.slice(offset, end));
 		buffer.set(raw);
 	}
 
 	public writeSync(path: string, buffer: Uint8Array, offset: number): void {
 		const node = this.get('write', path);
+		// @ts-expect-error
 		const data = decodeRaw(buffer);
 		const after = node.textContent!.slice(offset + data.length);
 		node.textContent = node.textContent!.slice(0, offset) + data + after;

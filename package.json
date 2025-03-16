@@ -49,7 +49,7 @@
 		"prepublishOnly": "npm run build"
 	},
 	"dependencies": {
-		"@zenfs/core": "link:../zenfs-core",
+		"@zenfs/core": "link:../core",
 		"utilium": "^1.6.0"
 	},
 	"devDependencies": {

@@ -1,5 +1,5 @@
 import type { Backend, SyncMapStore, Store } from '@zenfs/core';
-import { ErrnoError, Errno, StoreFS, decodeRaw, encodeRaw, SyncMapTransaction } from '@zenfs/core';
+import { ErrnoError, Errno, StoreFS, SyncMapTransaction } from '@zenfs/core';
 
 /**
  * A synchronous key-value store backed by Storage.

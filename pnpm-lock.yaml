@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@zenfs/core':
-        specifier: link:../zenfs-core
-        version: link:../zenfs-core
+        specifier: link:../core
+        version: link:../core
       utilium:
         specifier: ^1.6.0
         version: 1.6.0
